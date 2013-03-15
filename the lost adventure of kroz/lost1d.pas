@@ -21,9 +21,9 @@
 {Prepared for public release: 03/19/09 - Joe Siegler, Apogee Software, Ltd. }
 {*/                                                                         }
 {//-------------------------------------------------------------------------}
-{*** KINGDOM OF KROZ II levels.  By Scott Miller 08/31/89 ***}
+{*** THE LOST ADVENTURES OF KROZ levels.  By Scott Miller 08/31/89 ***}
 
-unit KINGDOM1;
+unit LOST1D;
 
 interface
 
@@ -52,7 +52,7 @@ const
 {B}  {21} Bomb      = #157;  
 {V}  {22} Lava      = #178;  
 {=}  {23} Pit       = #176;
-{A}  {24} Tome      = #12;
+{A}  {24} Tome      = #254;
 {U}  {25} Tunnel    = #239;
 {Z}  {26} Freeze    = #159;
 {*}  {27} Nugget    = #15;
@@ -235,7 +235,8 @@ var   DF       : array [1..Bottom] of Field;
       GravCounter,
       TreeRate,
       LavaRate,     { 10=slow, 90=fast }
-      GemColor   : integer;
+      GemColor,
+      ArtColor : integer;
       FastPC,
       LavaFlow,
       HideTrap,
@@ -253,6 +254,7 @@ var   DF       : array [1..Bottom] of Field;
       MagicEWalls,
       Color    : boolean;
 
+
 procedure MakeFloor(TilePattern: char; A,B,C,D: byte);
 procedure Flash(XPos,YPos:byte;Message:Str80);
 procedure PrintNum(YPos:byte; Num:longint);
@@ -264,6 +266,7 @@ procedure Sign_Off;
 procedure Col(Num1,Num2:byte);
 procedure Bak(Num1,Num2:byte);
 procedure Update_Info;
+procedure Bor(Num:byte);
 procedure Shareware(Wait: boolean);
 procedure New_Gem_Color;
 procedure Define_Levels;
@@ -279,6 +282,7 @@ procedure Trigger_Trap(Place:boolean; i:integer; ch:char);
 procedure Go(var XWay,YWay:integer; Human:boolean);
 procedure MoveRock(var XWay,YWay:integer);
 procedure Dead(DeadDot: boolean);
+procedure Got_Amulet(XWay,YWay:integer; Human:boolean);
 procedure High_Score(PlayAgain:boolean);
 procedure AddScore(What:integer);
 procedure Play(Start,Stop,Speed:integer);
@@ -430,7 +434,7 @@ procedure NoneSound;
 
 procedure Static;
   var x,y:integer;
- begin for x:= 1 to 15 do ;;
+ begin for x:= 1 to 15 do bor(random(16));bor(4);
   for x:=1 to 33 do
    case random(2) of
     0:for y:=1 to random(60)+10 do sound(random(4000)+3000);
@@ -444,50 +448,70 @@ procedure Col(Num1,Num2:byte);
 procedure Bak(Num1,Num2:byte);
  begin if Color then textbackground(Num1) else textbackground(Num2) end;
 
+procedure Bor(Num:byte);
+ var Result : Registers;
+ begin
+  if Color then
+    begin
+      with Result do begin AX:=$B00;BX:=Num; end;
+      intr($10,Result);
+    end;
+ end;
+
 procedure Sign_Off;
  begin
   Shareware(false);
   ClearKeys;
   col(7,7);
-  ;
+  bor(0);
   bak(0,0);
-  clrscr;             
-  gotoxy(31,2);write('KINGDOM OF KROZ II');
+  clrscr;
+  gotoxy(27,2);write('THE LOST ADVENTURES OF KROZ');
   gotoxy(26,3);writeln('An Apogee Software Production');
   writeln;
-  writeln('Other great games available from Scott Miller:');
+  writeln('Other new games available from Scott Miller:');
   writeln;col(15,15);
-  writeln('þ Six more Kroz games!  KINGDOM OF KROZ I, CAVERNS OF KROZ, DUNGEONS OF KROZ,');
+  writeln('þ Six more Kroz games!  KINGDOM OF KROZ, CAVERNS OF KROZ, DUNGEONS OF KROZ,');
   writeln('     RETURN TO KROZ, TEMPLE OF KROZ and THE FINAL CRUSADE OF KROZ.');
-  writeln('     Each volume is just $7.50, or order all six for $35!');
-  writeln;col(15,15);
-  writeln('þ THE LOST ADVENTURES OF KROZ - All-new seventh Kroz game with 75 of the best');
-  write  ('     levels yet!  Built-in contest!  New features galore.  ($20)');
-  cur(2);col(7,7);
+  writeln('     Each volume is just $7.50, or order all six for $35! (155 new levels!)');
+  writeln;col(7,7);
+  writeln('þ SUPERNOVA - Explore a galaxy and save a planet from an exploding star!');
+  writeln('     An epic adventure rated by Shareware Magazine as one of the best games');
+  writeln('     ever!  Highly advanced game has graphics, sound effects galore, clue');
+  writeln('     command, and dozens of unique features. ($10)');
+  writeln;
+  writeln('þ BEYOND THE TITANIC - A fantastic adventure of exploration and survival.');
+  writeln('     What really happened?  Sound effects and 16 color screens.  ($8)');
+  writeln;
+  writeln('þ WORD WHIZ - New game that challenges your knowledge of the English');
+  writeln('     language.  Fun to play, yet very education, too.  ($5)');
+  writeln;
+  writeln('þ Call for availability:  THE UNDERGROUND EMPIRE OF KROZ');
+  cur(2);
   ClearKeys;
   HALT;
  end; { Sign_Off }
 
 procedure Shareware(Wait: boolean);
  begin
-  bak(1,0);;clrscr;cur(3);col(15,15);
-  gotoxy(22,1);
-  writeln('KINGDOM OF KROZ II Ä HOW TO REGISTER');
+  bak(1,0);bor(1);clrscr;cur(3);col(15,15);
+  gotoxy(18,1);
+  writeln('THE LOST ADVENTURES OF KROZ Ä HOW TO REGISTER');
   gotoxy(1,2);
   for x:=1 to 80 do write('Ä');
   gotoxy(1,3);
   col(7,7);
-  writeln('  This is a shareware game, meaning it''s user-supported.  If you enjoy this');
+  writeln('  This is not a shareware game, but it is user-supported.  If you enjoy this');
   writeln('game you are asked by the author to please send a registration check in the');
-  writeln('amount of $7.50 to Apogee Software.');
+  writeln('amount of $20 to Apogee Software.');
   writeln('  This registration fee will qualify you to order any of the other Kroz');
   writeln('volumes available:');
   writeln;col(15,7);
-  writeln('  þ Caverns of Kroz   - the first discovery of Kroz');
-  writeln('  þ Dungeons of Kroz  - the dark side of Kroz, fast-paced action');
-  writeln('  þ Kingdom of Kroz I - the national contest winner ("Best Game" in 1988)');
-  writeln('  þ Return to Kroz    - the discovery of entirely new underground chambers');
-  writeln('  þ Temple of Kroz    - the bizarre side of Kroz, nothing is what it seems');
+  writeln('  þ Caverns of Kroz  - the first discovery of Kroz');
+  writeln('  þ Dungeons of Kroz - the dark side of Kroz, fast-paced action');
+  writeln('  þ Kingdom of Kroz  - the national contest winner ("Best Game" in 1988)');
+  writeln('  þ Return to Kroz   - the discovery of entirely new underground chambers');
+  writeln('  þ Temple of Kroz   - the bizarre side of Kroz, nothing is what it seems');
   writeln('  þ The Final Crusade of Kroz - the surprising finish?');
   writeln;col(7,7);
   writeln('Each game is priced $7.50 each, any three for $20, or all six for only $35.');
@@ -497,9 +521,8 @@ procedure Shareware(Wait: boolean);
   write('Please make checks payable to:');
   col(14,7);
   writeln('   Apogee Software    (phone: 214/240-0614)');gotoxy(31,21);
-  writeln('   4206 Mayflower');col(15,15);
-  write  ('Address always valid!');gotoxy(31,22);col(14,7);
-  writeln('   Garland, TX 75043  (USA)');
+  writeln('   4206 Mayflower');gotoxy(31,22);
+  writeln('   Garland, TX 75043');
   writeln;
   col(7,7);
   write('Thank you and enjoy the game.  -- Scott Miller');
@@ -513,7 +536,7 @@ procedure Shareware(Wait: boolean);
   ClearKeys;
   repeat x:=random(maxint) until keypressed;
   ClearKeys;
-  bak(0,0);;clrscr;cur(3);
+  bak(0,0);bor(4);clrscr;cur(3);
  end; { Shareware }
 
 procedure New_Gem_Color;
@@ -522,6 +545,10 @@ procedure New_Gem_Color;
    GemColor:=random(15)+1;
    if not Color then GemColor := 7;
   until GemColor <> 8;
+  repeat
+   ArtColor:=random(15)+1;
+  until (ArtColor<>8) and (ArtColor<>GemColor);
+  if not Color then ArtColor := 7;
  end;
 
 procedure Play(Start,Stop,Speed:integer);
@@ -561,8 +588,8 @@ procedure Won;
  begin
   Border;
   ClearKeys;
-  col(15,31);bak(BB,0); 
-  print(5,1,'YOUR QUEST FOR THE MAGICAL AMULET OF KROZ WAS SUCCESSFUL!!');
+  col(16,31);bak(BB,0); 
+  print(6,1,'YOUR QUEST FOR THE ANCIENT TOME OF KROZ WAS SUCCESSFUL!!');
   bak(0,0);
   High_Score(false);
  end; { Dead }
@@ -577,7 +604,7 @@ procedure High_Score(PlayAgain:boolean);
   bak(0,0);clrscr;
   window(1,1,80,25);
   cur(3);
-  assign(HSFile,'KINGDOM2.HS');
+  assign(HSFile,'LOST.HS');
   {$I-}
   reset(HSFile);
   {$I+}
@@ -588,20 +615,20 @@ procedure High_Score(PlayAgain:boolean);
      with HSList[x] do
       begin
        case x of
-        1:begin Name:='Scott Miller';HighScore:=13640;HighLevel:=16;end;
-        2:begin Name:='I. Jones';HighScore:=8574;HighLevel:=14;end;
-        3:begin Name:='Terry Nagy';HighScore:=6995;HighLevel:=11;end;
-        4:begin Name:='Cmdr. Keen';HighScore:=3501;HighLevel:=8;end;
-        5:begin Name:='Banzai Boyd';HighScore:=1228;HighLevel:=5;end
-        else begin Name:='Adventurer';HighScore:=0;HighLevel:=0;end
+        1:begin Name:='Scott Miller';HighScore:=26991;HighLevel:=31;end;
+        2:begin Name:='Mom Miller';HighScore:=21862;HighLevel:=27;end;
+        3:begin Name:='J. T. Kirk';HighScore:=12028;HighLevel:=20;end;
+        4:begin Name:='Clifton Karnes';HighScore:=8936;HighLevel:=14;end;
+        5:begin Name:='Indy Jones';HighScore:=90;HighLevel:=1;end
+        else begin Name:='Lost Adventurer';HighScore:=0;HighLevel:=0;end
        end;
        write(HSFile,HSList[x]);
       end;
     close(HSFile);
    end;
   col(9,9);
-  gotoxy(25,3);
-  write('KINGDOM OF KROZ II');
+  gotoxy(21,3);
+  write('THE LOST ADVENTURES OF KROZ');
   col(11,7);
   gotoxy(16,5);write('NAME');
   gotoxy(34,5);write('HIGH SCORE');
@@ -679,17 +706,17 @@ procedure High_Score(PlayAgain:boolean);
   if upcase(ch) <> 'N' then Restart:=true
   else
    begin
-    bak(0,0);col(15,15);;cur(1);
+    bak(0,0);col(15,15);bor(0);cur(1);
     clrscr;
     if not PlayAgain then
      begin
       gotoxy(1,2);
-      writeln('You''ve completed KINGDOM OF KROZ II!');
+      writeln('You''ve completed THE LOST ADVENTURES OF KROZ!');
      end
     else
      begin
       gotoxy(17,2);
-      writeln('KINGDOM OF KROZ II');
+      writeln('THE LOST ADVENTURES OF KROZ');
      end;
     Sign_Off;
    end;
@@ -735,7 +762,7 @@ procedure Define_Levels;
 
 DF[3]:=
 {  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
-' 80       50     1                      30                                                                           '+
+' 80       50 12  2       12             30                                                                           '+
 {  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
 '                                                                                    '+
 {  ‘  ’  “  ”  •  –  —}
@@ -751,13 +778,13 @@ DF[5]:=
   
 DF[7]:=
 {  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
-'         976 20  3  2     9            320     9             20                 9                                    '+
+'         980 20  3  2     9            320     9             20                 9                                    '+
 {  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
-'                       3  2  2  2  2                                                '+
+'                       3  1  1  1  1                                                '+
 {  ‘  ’  “  ”  •  –  —}
 '                 9   ';
 
-DF[9]:=
+DF[10]:=
 {  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
 ' 50          90  2  2                         25     1200 50                   55                                    '+
 {  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
@@ -765,7 +792,7 @@ DF[9]:=
 {  ‘  ’  “  ”  •  –  —}
 '                     ';
 
-DF[11]:=
+DF[12]:=
 {  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
 '100              2       45                                               8   100  3                                 '+
 {  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
@@ -773,7 +800,7 @@ DF[11]:=
 {  ‘  ’  “  ”  •  –  —}
 '                     ';
 
-DF[13]:=
+DF[16]:=
 {  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
 '350          20  2     9 40                                                    20  1                       3         '+
 {  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
@@ -781,25 +808,17 @@ DF[13]:=
 {  ‘  ’  “  ”  •  –  —}
 ' 30                  ';
 
-DF[15]:=
-{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
-'                 4                                             300            500 20                                 '+
-{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
-'                          2  2  2  2                                                '+
-{  ‘  ’  “  ”  •  –  —}
-'                     ';
-
 DF[17]:=
 {  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
-'                 1                                                                                     15            '+
+'                 2       20 20  1            700                                9                          1         '+
 {  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
-'                 1                                                                  '+
+'                          1  1  1  1                                         3300   '+
 {  ‘  ’  “  ”  •  –  —}
 '                     ';
 
 DF[19]:=
 {  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
-'600          20  1     5 30     5                                              20  5                           700   '+
+'   300       65  2    58  9     9      200                                                                           '+
 {  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
 '                                                                                    '+
 {  ‘  ’  “  ”  •  –  —}
@@ -807,13 +826,21 @@ DF[19]:=
 
 DF[21]:=
 {  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'600          20  1     5 30     5                                              20  5                           700   '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                                                                                    '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[23]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
 ' 40              3                            30                               80                    2               '+
 {  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
 '                          1  1  1  1                                       800      '+
 {  ‘  ’  “  ”  •  –  —}
 '                     ';
 
-DF[23]:=
+DF[25]:=
 {  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
 '                 1                                                                                         3         '+
 {  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
@@ -821,6 +848,189 @@ DF[23]:=
 {  ‘  ’  “  ”  •  –  —}
 ' 70 50  9 25  9 18   ';
 
+DF[27]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'        3        1  1      400               999                                                                50   '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                          1  1  1  1                                         3      '+
+{  ‘  ’  “  ”  •  –  —}
+'        1            ';
+
+DF[29]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+' 50            550         210                                                150  6                       2         '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                                                                                    '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[31]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'             70  2       50                           500150  6           3    20                                    '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                 1        2  2  2  2                                                '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[36]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'      100        1                                                                     200   100100         100   100'+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                                                                              200100'+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[38]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'             70  3       50     5  2           5                                                                     '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                          1  1  1  1      300                           960         '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[39]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'100      400     3                  500                                   5    50                                    '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                    1     1  1  1  1                                                '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[41]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'             25  2  1    25                                                   100                          1         '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                                                                           300900   '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[43]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'999              2      300                                                                                          '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'     8                                    100                                       '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[45]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'                 4                                             300            500 20                                 '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                          2  2  2  2                                                '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[47]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+' 50          90  2                                                             50   600                              '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                          1  1  1  1                                                '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[49]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'             30  2  2           5                                                            781               650   '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                                                                                    '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[50]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'                 1                                                                                     15            '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                 1                                                                  '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[51]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'         999     1       50                                   3                                        20  1         '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                          2  2  2  2                                                '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[57]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'600         200  2                                                                                                   '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                                                                                    '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[58]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'         716     5  5    20    10                                                                                    '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                                                                        715         '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[60]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'       25    30  4       30                   30                          5   100                                    '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                                                                           600      '+
+{  ‘  ’  “  ”  •  –  —}
+'           6         ';
+
+DF[62]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'             30  2  2           5                                                            781               650   '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'                                                                                    '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[63]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'100          20  4       20 20  9                               90       10    90  5                                 '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'     1                                                                        400   '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[65]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'         800 40  1                                           20                                                      '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'         600           5  1  1  1  1                                                '+
+{  ‘  ’  “  ”  •  –  —}
+'                     ';
+
+DF[67]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'300             20     9        9                     400100                                         6               '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'     2                                                                              '+
+{  ‘  ’  “  ”  •  –  —}
+'        8  8  8 99 20';
+
+DF[69]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'      400        3          20             50                 2          25                                          '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'     1                                                                              '+
+{  ‘  ’  “  ”  •  –  —}
+'     2  5  5  5 70   ';
+
+DF[71]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'150150150900 20  6  3    20     5                                                                                    '+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'        1                                                                            '+
+{  ‘  ’  “  ”  •  –  —}
+'        1  1  1 50  ';
+
+DF[73]:=
+{  1  2  3  X  W  L  C  S  +  I  T  K  D  #  F  .  R  Q  /  \  B  V  =  A  U  Z  *  E  ;  :  `  -  @  %  ]  G  (  M  )}
+'      420        5          30                20              1               200                90          90    90'+
+{  P  &  !  O  H  ?  >  N  <  [  |  "  4  5  6  7  8  9  ñ  ò  ó  ô  õ  ö  Y  0  ~  $}
+'     1                    4  4  4  4                                    250       90'+
+{  ‘  ’  “  ”  •  –  —}
+' 20     9  9  9 50   ';
  end; { Define_Levels }
 
 procedure Convert_Format;
@@ -1033,6 +1243,20 @@ procedure Trigger_Trap(Place:boolean; i:integer; ch:char);
    begin gotoxy(PX-1,PY);write(ch);if Place then PF[PX-1,PY]:=i;end;delay(5);
  end; { Trigger_Trap }
 
+procedure Got_Amulet(XWay,YWay:integer; Human:boolean);
+ begin
+  Go(XWay,YWay,Human);
+  GrabSound;
+  for x:=45 downto 11 do
+   for y:=13 downto 1 do
+    begin sound(x*x*y);delay(y+1);end; nosound;
+  Score:=Score+2500;
+  Update_Info; 
+  Flash(7,25,'You have found the Amulet of Yendor -- 25,000 points!');
+  Flash(5,25,'(It seems that Kroz and Rogue share the same underground!)');
+  Flash(5,25,'Your quest for the treasure of Kroz must still continue...');
+ end; { Got_Amulet }
+
 procedure End_Routine;
  begin
   FootStep;
@@ -1126,24 +1350,24 @@ procedure End_Routine;
   writeln('ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ');
   writeln;
   col(15,7);
-  { 15 writeln's available for text }
-  writeln('   For years you''ve waited for such a wonderful archaeological');
-  writeln(' discovery. And now you possess one of the greatest finds ever!');
-  writeln('   The Magical Amulet will bring you great fame, and even more');
-  writeln(' so if you ever learn how to harness the Amulet''s magical');
-  writeln(' abilities.  For now it must wait, though, for Kroz is a huge');
-  writeln(' place, and still mostly unexplored.');
-  writeln('   Even with the many dangers that await, you feel another');
-  writeln(' expedition is in order.  You must leave no puzzle unsolved, no');
-  writeln(' treasure unfound--to quit now would leave the job unfinished.');
-  writeln('   So you plan for a good night''s rest, and think ahead to');
-  writeln(' tomorrow''s new journey.  What does the mysterious kingdom of');
-  writeln(' Kroz have waiting for you, what type of new creatures will');
-  writeln(' try for your blood, and what kind of brilliant treasure does');
-  writeln(' Kroz protect.  Tomorrow will tell...');
+  writeln('   Carefully, you place the ancient tome on your table and open');
+  writeln(' to the first page.  You read the book intently, quickly');
+  writeln(' deciphering the archaic writings.');
+  writeln('   You learn of Lord Dullwit, the once powerful and benevolent');
+  writeln(' ruler of Kroz, who sought wealth and education for his people.');
+  writeln(' The magnificent kingdom of Kroz was once a great empire, until');
+  writeln(' it was overthrown by an evil Wizard, who wanted the riches of');
+  writeln(' Kroz for himself.');
+  writeln('   Using magic beyond understanding, the Wizard trapped Lord');
+  writeln(' Dullwit and his people in a chamber so deep in Kroz that any');
+  writeln(' hope of escape was fruitless.');
+  writeln('   The Wizard then built hundreds of deadly chambers that would');
+  writeln(' stop anyone from ever rescuing the good people of Kroz.');
+  writeln('   Once again your thoughts becomes clear:  To venture into the');
+  writeln(' depths once more and set free the people of Kroz, in:');
   writeln;col(14,15);
-  writeln('                         RETURN TO KROZ');col(15,7);
-  write  ('        ( Now available -- $7.50 or write for details. )');
+  writeln('                  THE UNDERGROUND EMPIRE OF KROZ');col(15,7);
+  write('               (Coming in 1991 -- call for details)');
   ClearKeys;
   window(1,1,80,25);bak(0,0);
   Flash(21,25,'Press any key, Adventurer.');

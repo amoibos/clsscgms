@@ -380,23 +380,12 @@ procedure ClearKeys;
  end;
 
 procedure Cur(Num:byte);
- var Result : Registers;
  begin
-  Result.AX := $100;
-  with Result do
-   if Color then
     case Num of
-     1:CX:=$707;   { Underline   }
-     2:CX:=$8;     { Solid Block }
-     3:CX:=$2000;  { Invisible   }
-    end
-   else
-    case Num of
-     1:CX:=$C0D;
-     2:CX:=$E;
-     3:CX:=$2000;
+     1:cursoron;   { Underline   }
+     2:cursorbig;     { Solid Block }
+     3:cursoroff;  { Invisible   }
     end;
-   intr($10,Result);
  end; { Cur }
 
 procedure FootStep;

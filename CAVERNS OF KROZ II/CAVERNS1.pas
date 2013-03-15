@@ -381,15 +381,11 @@ procedure ClearKeys;
  end;
 
 procedure Cur(Num:byte);
-{freepascal only}
  begin
-
-   if Color then
-
    case Num of
-      1: ;{ Underline   }//SetCursorType(crUnderline);
-      2: cursorbig;{ Solid block }{SetCursorType(crBlock);}
-      3:cursoroff; { Invisible   }{SetCursorType(crHidden);}
+      1: cursoron;{ Underline   }
+      2: cursorbig;{ Solid block }
+      3:cursoroff; { Invisible   }
     end;
  end;
 

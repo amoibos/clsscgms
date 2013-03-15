@@ -671,17 +671,13 @@ for x:=1 to RMax do L[x]:=L[x]+[30,34,49,60,103,113,116,122,131];
 procedure SF; begin SFlag:=True end;
 
 procedure Cur(Num:byte);
-{freepascal only}
- begin
-
-   if Color then
-
+begin
    case Num of
-      1: ;{ Underline   }//SetCursorType(crUnderline);
-      2: cursorbig;{ Solid block }{SetCursorType(crBlock);}
-      3:cursoroff; { Invisible   }{SetCursorType(crHidden);}
+      1: cursoron;{ Underline   }
+      2: cursorbig;{ Solid block }
+      3:cursoroff; { Invisible   }
     end;
- end;
+end;
 
 procedure Col(Num1,Num2:byte);
  begin if Color then textcolor(Num1) else textcolor(Num2) end;
